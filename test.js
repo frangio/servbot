@@ -53,7 +53,7 @@ test('Index page', async () => {
             <h1>hello world</h1>
           </body>
         </html>
-    `.replace(/\n/g,'\r\n');
+    `;
 
     assert.equal(data, expected);
 });
@@ -75,7 +75,7 @@ test('About page', async () => {
             <h1>about</h1>
           </body>
         </html>
-    `.replace(/\n/g,'\r\n');
+    `;
 
     assert.equal(data, expected);
 
