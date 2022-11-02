@@ -27,14 +27,14 @@ export default ({
     fallback = '',
     ignores = [],
     credentials,
-    verbose = true
+    verbose = true,
+    port = 8080,
 }) => {
     const serverRoot = resolve(root);
     if (!existsSync(serverRoot) || !statSync(serverRoot).isDirectory()) {
         throw Error(`[servbot] Invalid root directory: ${serverRoot}`);
     }
 
-    let internalPort = 8080;
     const protocol = credentials ? 'https://' : 'http://';
     const htmlToAppend = reload ? RELOAD_HTML : '';
     const clients = [];
@@ -131,17 +131,11 @@ export default ({
         res.end();
     }
 
-    return {
-        listen: (port) => {
-            internalPort = port || internalPort;
-            log(`Server started: ${protocol}localhost:${internalPort}`);
-            server.listen(internalPort);
-        },
+    log(`Server started: ${protocol}localhost:${port}`);
+    server.listen(port);
 
-        close: (callback) => {
-            log(`Server closed: ${protocol}localhost:${internalPort}`);
-            server.close(callback);
-        },
+    return {
+        server,
 
         reload: () => {
             if (!clients.length) return;

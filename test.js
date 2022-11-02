@@ -18,8 +18,7 @@ let server;
 let listening = false;
 
 const start = (opts) => {
-    server = servbot(opts);
-    server.listen(PORT);
+    server = servbot({ port: PORT, ...opts }).server;
     listening = true;
 };
 
