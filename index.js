@@ -37,10 +37,10 @@ export default ({
 
     const protocol = credentials ? 'https://' : 'http://';
     const htmlToAppend = reload ? RELOAD_HTML : '';
-    const clients = [];
+    const clients = new Set();
 
     process.on('SIGINT', () => {
-        clients.map((res) => res.end());
+        clients.forEach((res) => res.end());
         process.exit();
     });
 
@@ -55,6 +55,8 @@ export default ({
         let { pathname } = url;
 
         if (reload && pathname == EVENT_SOURCE) {
+            res.addListener('close', () => clients.delete(res));
+
             res.writeHead(200, {
                 'Content-Type': 'text/event-stream',
                 'Cache-Control': 'no-cache',
@@ -62,7 +64,7 @@ export default ({
             });
 
             res.write('event: connected\ndata: ready\n\n\n');
-            clients.push(res);
+            clients.add(res);
             return;
         }
 
@@ -138,10 +140,9 @@ export default ({
         server,
 
         reload: () => {
-            if (!clients.length) return;
-            const res = clients.pop();
-            res.write('event: message\ndata: reload\n\n\n');
-            res.end();
+            clients.forEach((res) =>
+                res.write('event: message\ndata: reload\n\n\n')
+            );
         }
     };
 };
